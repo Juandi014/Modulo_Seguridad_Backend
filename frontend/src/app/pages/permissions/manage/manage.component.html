@@ -1,0 +1,105 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0" *ngIf="mode==1">Detalle del permiso</h3>
+                    <h3 class="mb-0" *ngIf="mode==2">Crear permiso</h3>
+                    <h3 class="mb-0" *ngIf="mode==3">Actualizar permiso</h3>
+                </div>
+                <div class="card-body">
+                    <form class="form" [formGroup]="theFormGroup">
+                        <div class="card-body container">
+                            <div class="row" *ngIf="mode!=2">
+                                <div class="col-3">ID</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" formControlName="id" readonly>
+                                </div>
+                            </div>
+                            <br *ngIf="mode!=2">
+                            <div class="row">
+                                <div class="col-3">Módulo</div>
+                                <div class="col-9">
+                                    <select class="form-control" formControlName="module">
+                                        <option value="" disabled>Seleccione un módulo</option>
+                                        <option *ngFor="let module of modules" [value]="module.value">{{module.label}}</option>
+                                    </select>
+                                    <div *ngIf="getTheFormGroup.module.errors && (getTheFormGroup.module.dirty || getTheFormGroup.module.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.module.errors.required" class="msnError">Requerido</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Recurso / modelo</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" formControlName="resource"
+                                        list="existing-resources" placeholder="Ej: Usuarios, Torneos, Equipos">
+                                    <datalist id="existing-resources">
+                                        <option *ngFor="let resource of existingResources" [value]="resource"></option>
+                                    </datalist>
+                                    <div *ngIf="getTheFormGroup.resource.errors && (getTheFormGroup.resource.dirty || getTheFormGroup.resource.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.resource.errors.required" class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.resource.errors.maxlength" class="msnError">Máximo 50 caracteres</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Operación</div>
+                                <div class="col-9">
+                                    <select class="form-control" formControlName="operation">
+                                        <option value="" disabled>Seleccione una operación</option>
+                                        <option *ngFor="let operation of operations" [value]="operation.value">{{operation.label}}</option>
+                                    </select>
+                                    <div *ngIf="getTheFormGroup.operation.errors && (getTheFormGroup.operation.dirty || getTheFormGroup.operation.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.operation.errors.required" class="msnError">Requerido</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Método HTTP</div>
+                                <div class="col-9">
+                                    <select class="form-control" formControlName="method">
+                                        <option value="" disabled>Seleccione un método</option>
+                                        <option *ngFor="let method of methods" [value]="method">{{method}}</option>
+                                    </select>
+                                    <div *ngIf="getTheFormGroup.method.errors && (getTheFormGroup.method.dirty || getTheFormGroup.method.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.method.errors.required" class="msnError">Requerido</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">URL</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" formControlName="url"
+                                        placeholder="/api/recurso/{id}">
+                                    <small class="text-muted">Los identificadores se guardan como {{ '{' }}id{{ '}' }}: /api/users/5 → /api/users/{{ '{' }}id{{ '}' }}</small>
+                                    <div *ngIf="getTheFormGroup.url.errors && (getTheFormGroup.url.dirty || getTheFormGroup.url.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.url.errors.required" class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.url.errors.pattern" class="msnError">Debe iniciar con / y no tener espacios</strong>
+                                        <strong *ngIf="getTheFormGroup.url.errors.maxlength" class="msnError">Máximo 255 caracteres</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-9">
+                                    <button type="button" class="btn btn-primary btn-block" (click)="create()"
+                                        *ngIf="mode==2">Crear</button>
+                                    <button type="button" class="btn btn-primary btn-block" (click)="update()"
+                                        *ngIf="mode==3">Actualizar</button>
+                                    <button type="button" class="btn btn-secondary btn-block" (click)="back()">Regresar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

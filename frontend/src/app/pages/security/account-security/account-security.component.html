@@ -1,0 +1,156 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <!-- Autenticación de dos factores -->
+            <div class="card shadow mb-4" *ngIf="twoFactor">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0"><i class="ni ni-key-25"></i> Autenticación de dos factores (2FA)</h3>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="!twoFactor.available" class="alert alert-info-dark mb-0">
+                        Su cuenta inicia sesión con <strong>{{providerLabels[user.authProvider]}}</strong>.
+                        La plataforma confía en las medidas de seguridad de ese proveedor, por lo que el 2FA interno no aplica.
+                    </div>
+                    <div *ngIf="twoFactor.available" class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="mb-2">
+                            <span class="mr-2">Estado:</span>
+                            <span class="badge" [ngClass]="twoFactor.enabled ? 'badge-state-on' : 'badge-state-off'">
+                                {{twoFactor.enabled ? 'Habilitado' : 'Deshabilitado'}}
+                            </span>
+                            <small class="d-block text-muted mt-2">
+                                Al iniciar sesión con su contraseña se le pedirá un código de 6 dígitos enviado a su correo,
+                                válido por 5 minutos y de un solo uso.
+                            </small>
+                        </div>
+                        <button type="button" class="btn mb-2" [ngClass]="twoFactor.enabled ? 'btn-secondary' : 'btn-primary'"
+                            (click)="toggleTwoFactor()">
+                            {{twoFactor.enabled ? 'Deshabilitar' : 'Habilitar'}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cambiar contraseña -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0"><i class="ni ni-lock-circle-open"></i> Cambiar contraseña</h3>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="isExternalAccount" class="alert alert-info-dark mb-0">
+                        Su cuenta inicia sesión con <strong>{{providerLabels[user.authProvider]}}</strong>
+                        y no tiene contraseña en la plataforma. Gestione su contraseña directamente con ese proveedor.
+                    </div>
+
+                    <form *ngIf="!isExternalAccount" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                        <div class="row">
+                            <div class="col-md-4">Contraseña actual</div>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" formControlName="currentPassword"
+                                    autocomplete="current-password">
+                                <div *ngIf="showErrors('currentPassword')">
+                                    <strong class="msnError">Requerido</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4">Nueva contraseña</div>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" formControlName="newPassword"
+                                    autocomplete="new-password">
+                                <small class="text-muted">{{passwordRuleMessage}}</small>
+                                <div *ngIf="showErrors('newPassword')">
+                                    <strong *ngIf="passwordControls.newPassword.errors.required" class="msnError">Requerido</strong>
+                                    <strong *ngIf="passwordControls.newPassword.errors.pattern" class="msnError">
+                                        La contraseña no cumple las reglas de seguridad</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4">Confirmar nueva contraseña</div>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" formControlName="confirmPassword"
+                                    autocomplete="new-password">
+                                <div *ngIf="showErrors('confirmPassword')">
+                                    <strong class="msnError">Requerido</strong>
+                                </div>
+                                <div *ngIf="passwordForm.errors?.mismatch && (passwordControls.confirmPassword.dirty || trySend)">
+                                    <strong class="msnError">Las contraseñas no coinciden</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-8">
+                                <button type="submit" class="btn btn-primary" [disabled]="sending">Cambiar contraseña</button>
+                                <small class="d-block text-muted mt-2">
+                                    Por seguridad, al cambiarla se cerrarán todas sus sesiones abiertas.
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Mis sesiones -->
+            <div class="card shadow">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0"><i class="ni ni-watch-time"></i> Mis sesiones</h3>
+                    <button type="button" class="btn btn-sm btn-secondary" (click)="loadSessions()">Actualizar</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Inicio</th>
+                                <th>Expira</th>
+                                <th>Método</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let session of sessions">
+                                <td>{{session.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
+                                <td>{{session.expiration | date:'dd/MM/yyyy HH:mm'}}</td>
+                                <td>{{providerLabels[session.authMethod] || '-'}}</td>
+                                <td>
+                                    <span class="badge" [ngClass]="session.active ? 'badge-state-on' : 'badge-state-off'">
+                                        {{sessionState(session)}}
+                                    </span>
+                                    <span *ngIf="session.current" class="badge badge-secondary ml-1">Esta sesión</span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="sessions.length == 0">
+                                <td colspan="4" class="text-center text-muted">No hay sesiones registradas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos de la cuenta -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0"><i class="ni ni-single-02"></i> Mi cuenta</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Nombre:</span><strong>{{user?.name}}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Correo:</span><strong>{{user?.email}}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Acceso:</span>
+                        <span class="badge badge-secondary">{{providerLabels[user?.authProvider] || '-'}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

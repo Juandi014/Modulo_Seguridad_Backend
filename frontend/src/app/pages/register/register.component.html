@@ -1,0 +1,86 @@
+<div class="container auth-container">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="card shadow border-0">
+        <div class="card-header auth-card-header">
+          <h2 class="mb-1">Crear cuenta</h2>
+          <p class="text-muted mb-0">Regístrese con su correo electrónico y una contraseña para acceder a SportManager.</p>
+        </div>
+        <div class="card-body px-lg-5 py-lg-5">
+          <form role="form" [formGroup]="theFormGroup" (ngSubmit)="register()">
+            <div class="form-group">
+              <label class="form-control-label">Nombre</label>
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
+                </div>
+                <input class="form-control" placeholder="Nombre completo" type="text" formControlName="name">
+              </div>
+              <div *ngIf="showErrors('name')">
+                <strong *ngIf="getTheFormGroup.name.errors.required" class="msnError">Requerido</strong>
+                <strong *ngIf="getTheFormGroup.name.errors.minlength || getTheFormGroup.name.errors.maxlength"
+                  class="msnError">Debe tener entre 2 y 100 caracteres</strong>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-control-label">Correo electrónico</label>
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                </div>
+                <input class="form-control" placeholder="correo@ejemplo.com" type="email" formControlName="email">
+              </div>
+              <div *ngIf="showErrors('email')">
+                <strong *ngIf="getTheFormGroup.email.errors.required" class="msnError">Requerido</strong>
+                <strong *ngIf="getTheFormGroup.email.errors.email" class="msnError">Formato de correo inválido</strong>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-control-label">Contraseña</label>
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                </div>
+                <input class="form-control" type="password" formControlName="password" autocomplete="new-password">
+              </div>
+              <small class="text-muted">{{passwordRuleMessage}}</small>
+              <div *ngIf="showErrors('password')">
+                <strong *ngIf="getTheFormGroup.password.errors.required" class="msnError">Requerido</strong>
+                <strong *ngIf="getTheFormGroup.password.errors.pattern" class="msnError">
+                  La contraseña no cumple las reglas de seguridad</strong>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-control-label">Confirmar contraseña</label>
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                </div>
+                <input class="form-control" type="password" formControlName="confirmPassword" autocomplete="new-password">
+              </div>
+              <div *ngIf="showErrors('confirmPassword')">
+                <strong *ngIf="getTheFormGroup.confirmPassword.errors.required" class="msnError">Requerido</strong>
+              </div>
+              <div *ngIf="theFormGroup.errors?.mismatch && (getTheFormGroup.confirmPassword.dirty || trySend)">
+                <strong class="msnError">Las contraseñas no coinciden</strong>
+              </div>
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary mt-3" [disabled]="sending">Crear cuenta</button>
+            </div>
+          </form>
+          <hr>
+          <p class="text-center text-muted mb-0">
+            <small>¿Usa Google, GitHub o Facebook? No necesita registrarse:
+              inicie sesión directamente con su proveedor.</small>
+          </p>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12 text-center">
+          <a [routerLink]="['/login']"><small>¿Ya tiene cuenta? Inicie sesión</small></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

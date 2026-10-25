@@ -1,0 +1,52 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Listado de roles</h3>
+                    <div>
+                        <button class="btn btn-secondary" (click)="assignPermissions()"><i class="ni ni-check-bold"></i> Asignar permisos</button>
+                        <button class="btn btn-primary" (click)="create()"><i class="ni ni-fat-add"></i> Crear rol</button>
+                    </div>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let role of roles">
+                                <td>{{role.id}}</td>
+                                <td>{{role.name}}</td>
+                                <td>{{role.description}}</td>
+                                <td>
+                                    <span class="badge" [ngClass]="role.active ? 'badge-state-on' : 'badge-state-off'">
+                                        {{role.active ? 'Activo' : 'Inactivo'}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" (click)="view(role.id)">Ver</button>
+                                    <button class="btn btn-sm btn-secondary" (click)="edit(role.id)">Editar</button>
+                                    <button *ngIf="role.active" class="btn btn-sm btn-secondary" (click)="deactivate(role)">Desactivar</button>
+                                    <button *ngIf="!role.active" class="btn btn-sm btn-secondary" (click)="activate(role)">Activar</button>
+                                    <button class="btn btn-sm btn-secondary" (click)="delete(role)">Eliminar</button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="roles.length == 0">
+                                <td colspan="5" class="text-center text-muted">No hay roles registrados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

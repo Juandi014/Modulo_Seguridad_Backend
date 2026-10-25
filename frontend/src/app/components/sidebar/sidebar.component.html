@@ -1,0 +1,71 @@
+<nav class="navbar navbar-vertical navbar-expand-md navbar-light" id="sidenav-main">
+  <div class="container-fluid">
+    <!-- Toggler (móvil) -->
+    <button class="navbar-toggler" type="button" (click)="isCollapsed=!isCollapsed"
+       aria-controls="sidenav-collapse-main">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Marca -->
+    <a class="navbar-brand sidebar-brand" [routerLink]="['/dashboard']">
+      <app-brand></app-brand>
+    </a>
+    <!-- Usuario (móvil) -->
+    <ul class="nav align-items-center d-md-none">
+      <li class="nav-item" ngbDropdown placement="bottom-right">
+        <a class="nav-link" role="button" ngbDropdownToggle>
+          <span class="avatar-initials avatar-initials-sm">{{user?.name?.charAt(0) || '?'}}</span>
+        </a>
+        <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+          <div class="dropdown-header noti-title">
+            <h6 class="text-overflow m-0">{{user?.name}}</h6>
+          </div>
+          <a [routerLink]="['/profiles/me/view']" class="dropdown-item">
+            <i class="ni ni-single-02"></i><span>Mi perfil</span>
+          </a>
+          <a [routerLink]="['/security']" class="dropdown-item">
+            <i class="ni ni-lock-circle-open"></i><span>Seguridad</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="javascript:void(0)" class="dropdown-item" (click)="logout()">
+            <i class="ni ni-user-run"></i><span>Cerrar sesión</span>
+          </a>
+        </div>
+      </li>
+    </ul>
+    <!-- Menú -->
+    <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
+      <!-- Encabezado del menú en móvil -->
+      <div class="navbar-collapse-header d-md-none">
+        <div class="row">
+          <div class="col-9 collapse-brand">
+            <a [routerLink]="['/dashboard']"><app-brand></app-brand></a>
+          </div>
+          <div class="col-3 collapse-close">
+            <button type="button" class="navbar-toggler" (click)="isCollapsed=!isCollapsed">
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <h6 class="sidebar-heading">Menú principal</h6>
+      <ul class="navbar-nav">
+        <li *ngFor="let menuItem of menuItems" class="nav-item">
+          <a [routerLink]="[menuItem.path]" class="nav-link" [class.active]="isActive(menuItem)">
+            <span class="nav-icon"><i class="ni {{menuItem.icon}}"></i></span>
+            {{menuItem.title}}
+          </a>
+        </li>
+      </ul>
+      <!-- Sesión activa -->
+      <div class="sidebar-session" *ngIf="user?.token">
+        <div class="sidebar-session-info">
+          <small><span class="session-dot"></span>Sesión activa</small>
+          <strong class="text-overflow">{{user.name}}</strong>
+          <small class="text-overflow">{{user.email}}</small>
+        </div>
+        <i class="ni ni-check-bold sidebar-session-icon"></i>
+      </div>
+    </div>
+  </div>
+</nav>

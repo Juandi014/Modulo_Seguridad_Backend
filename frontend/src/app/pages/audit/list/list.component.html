@@ -1,0 +1,78 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0">Intentos de inicio de sesión</h3>
+                    <small class="text-muted">Incluye los intentos exitosos y los fallidos.</small>
+                </div>
+                <div class="card-body pb-0">
+                    <!-- Filtros -->
+                    <form class="row align-items-end" (ngSubmit)="search()">
+                        <div class="col-md-5 mb-3">
+                            <label class="form-control-label">Correo</label>
+                            <input type="text" class="form-control" name="email" placeholder="Buscar por correo"
+                                [(ngModel)]="emailFilter">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-control-label">Resultado</label>
+                            <select class="form-control" name="result" [(ngModel)]="resultFilter">
+                                <option value="">Todos</option>
+                                <option *ngFor="let result of results" [value]="result.value">{{result.label}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button type="submit" class="btn btn-primary">Buscar</button>
+                            <button type="button" class="btn btn-secondary" (click)="clearFilters()">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Correo</th>
+                                <th>Usuario</th>
+                                <th>Método</th>
+                                <th>Resultado</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let attempt of page.content">
+                                <td>{{attempt.createdAt | date:'dd/MM/yyyy HH:mm:ss'}}</td>
+                                <td>{{attempt.email || '-'}}</td>
+                                <td>{{attempt.userName || '-'}}</td>
+                                <td>{{providerLabels[attempt.method] || attempt.method}}</td>
+                                <td>
+                                    <span class="badge" [ngClass]="isSuccess(attempt.result) ? 'badge-state-on' : 'badge-state-off'">
+                                        {{resultLabel(attempt.result)}}
+                                    </span>
+                                </td>
+                                <td>{{attempt.ipAddress || '-'}}</td>
+                            </tr>
+                            <tr *ngIf="!loading && page.content.length == 0">
+                                <td colspan="6" class="text-center text-muted">No hay intentos registrados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Paginación -->
+                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center flex-wrap">
+                    <small class="text-muted">
+                        {{page.totalElements}} registro(s)
+                        <span *ngIf="page.totalPages > 0"> · Página {{page.page + 1}} de {{page.totalPages}}</span>
+                    </small>
+                    <div>
+                        <button class="btn btn-sm btn-secondary" [disabled]="page.page === 0 || loading"
+                            (click)="list(page.page - 1)">Anterior</button>
+                        <button class="btn btn-sm btn-secondary" [disabled]="page.page + 1 >= page.totalPages || loading"
+                            (click)="list(page.page + 1)">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

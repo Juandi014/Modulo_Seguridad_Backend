@@ -1,0 +1,226 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <!-- Columna principal -->
+        <div class="col-lg-8 mb-4">
+            <!-- Selección de rol y acciones -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="row align-items-end">
+                        <div class="col-xl-5 mb-3">
+                            <label class="form-control-label">Rol seleccionado</label>
+                            <div ngbDropdown class="role-select">
+                                <button type="button" class="form-control role-select-toggle" ngbDropdownToggle>
+                                    <span>
+                                        <i class="fas fa-user mr-2"></i>
+                                        {{selectedRole ? selectedRole.name : 'Seleccione un rol'}}
+                                    </span>
+                                </button>
+                                <div ngbDropdownMenu class="w-100">
+                                    <button type="button" ngbDropdownItem *ngFor="let role of roles"
+                                        [class.active]="role.id === selectedRoleId" (click)="selectRole(role)">
+                                        <i class="fas fa-user mr-2"></i>
+                                        {{role.name}}
+                                        <small *ngIf="!role.active" class="text-muted">(inactivo)</small>
+                                        <i *ngIf="role.id === selectedRoleId" class="fas fa-check role-select-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-7 mb-3 button-bar justify-content-xl-end">
+                            <button class="btn btn-secondary" (click)="loadPermissions()">
+                                <i class="ni ni-cloud-download-95"></i> Cargar permisos
+                            </button>
+                            <button class="btn btn-primary" (click)="save()" [disabled]="!matrix || !hasChanges || saving">
+                                <i class="ni ni-check-bold"></i> Guardar cambios
+                            </button>
+                            <button class="btn btn-secondary" (click)="reset()" [disabled]="!matrix || !hasChanges">
+                                <i class="ni ni-curved-next"></i> Restablecer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensajes -->
+            <div class="row">
+                <div class="col-md-6" *ngIf="successMessage">
+                    <div class="alert alert-success d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-check-circle mr-1"></i> {{successMessage}}</span>
+                        <button type="button" class="close" (click)="successMessage = ''">&times;</button>
+                    </div>
+                </div>
+                <div class="col-md-6" *ngIf="matrix">
+                    <div class="alert alert-info-dark">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Los permisos seleccionados se conservarán después de cerrar e iniciar sesión nuevamente.
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="matrix && hasChanges" class="alert alert-info-dark">
+                Tiene cambios sin guardar. Use <strong>Guardar cambios</strong> para aplicarlos o <strong>Restablecer</strong> para descartarlos.
+            </div>
+            <div *ngIf="matrix && !matrix.role.active" class="alert alert-danger">
+                Este rol está inactivo: sus permisos no se aplican a los usuarios mientras siga inactivo.
+            </div>
+
+            <!-- Matriz -->
+            <div class="card shadow">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Matriz de permisos del rol</h3>
+                    <button class="btn btn-sm btn-secondary" (click)="manageRoles()">
+                        <i class="fas fa-user-tag mr-1"></i> Gestionar roles
+                    </button>
+                </div>
+                <div class="card-body" *ngIf="!matrix">
+                    <p class="text-center text-muted mb-0">Seleccione un rol y pulse <strong>Cargar permisos</strong>.</p>
+                </div>
+                <div class="table-responsive" *ngIf="matrix">
+                    <table class="table permission-matrix mb-0">
+                        <thead>
+                            <tr>
+                                <th>Recurso</th>
+                                <th *ngFor="let operation of operations" class="text-center">{{operation.label}}</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngFor="let group of groups">
+                            <tr class="matrix-module" (click)="toggleGroup(group)">
+                                <td [attr.colspan]="operations.length + 1">
+                                    <i class="fas mr-2" [ngClass]="group.collapsed ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                                    {{group.label}}
+                                </td>
+                            </tr>
+                            <ng-container *ngIf="!group.collapsed">
+                                <tr *ngFor="let row of group.rows">
+                                    <td class="pl-5">
+                                        <i class="fas fa-fw mr-2 matrix-resource-icon" [ngClass]="resourceIcon(row.resource)"></i>
+                                        {{row.resource}}
+                                    </td>
+                                    <td *ngFor="let operation of operations" class="text-center">
+                                        <ng-container *ngIf="cell(row, operation.value) as c; else noPermission">
+                                            <input type="checkbox" class="matrix-check"
+                                                [checked]="isCellChecked(c)"
+                                                [indeterminate]="isCellPartial(c)"
+                                                [title]="cellTitle(c)"
+                                                (change)="toggleCell(c)">
+                                        </ng-container>
+                                        <ng-template #noPermission>
+                                            <span class="text-muted" title="No hay permisos registrados para esta operación">—</span>
+                                        </ng-template>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                        <!-- Permisos sin módulo, recurso u operación -->
+                        <tbody *ngIf="unclassified.length > 0">
+                            <tr class="matrix-module">
+                                <td [attr.colspan]="operations.length + 1">Sin clasificar</td>
+                            </tr>
+                            <tr *ngFor="let permission of unclassified">
+                                <td class="pl-5" [attr.colspan]="operations.length">
+                                    <code class="text-primary">{{permission.method}} {{permission.url}}</code>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" class="matrix-check"
+                                        [checked]="checked.has(permission.id)"
+                                        (change)="togglePermission(permission)">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-transparent" *ngIf="matrix">
+                    <small class="text-muted">
+                        Pase el cursor sobre una casilla para ver los endpoints que incluye.
+                        Una casilla con guion (<strong>–</strong>) dentro está asignada parcialmente.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna lateral: resumen, leyenda y reglas -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0"><i class="fas fa-user-circle mr-1"></i> Resumen del rol</h3>
+                </div>
+                <div class="card-body" *ngIf="!matrix">
+                    <p class="text-muted mb-0">Sin rol cargado.</p>
+                </div>
+                <div class="card-body" *ngIf="matrix">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Nombre del rol:</span>
+                        <strong>{{matrix.role.name}}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Estado:</span>
+                        <span class="badge" [ngClass]="matrix.role.active ? 'badge-state-on' : 'badge-state-off'">
+                            {{matrix.role.active ? 'Activo' : 'Inactivo'}}
+                        </span>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="fas fa-fw fa-users mr-1"></i> Usuarios asociados:</span>
+                        <strong>{{matrix.userCount}}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="fas fa-fw fa-key mr-1"></i> Total permisos asignados:</span>
+                        <strong>{{assignedCount}}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span><i class="fas fa-fw fa-cube mr-1"></i> Módulos con acceso:</span>
+                        <strong>{{modulesWithAccess}}</strong>
+                    </div>
+                    <div class="row no-gutters summary-tiles">
+                        <div class="col-4">
+                            <div class="summary-tile">
+                                <i class="fas fa-shield-alt summary-icon"></i>
+                                <small>Total permisos disponibles</small>
+                                <span class="summary-value">{{totalCount}}</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="summary-tile tile-assigned">
+                                <i class="fas fa-check-circle summary-icon"></i>
+                                <small>Asignados</small>
+                                <span class="summary-value">{{assignedCount}}</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="summary-tile tile-not-assigned">
+                                <i class="fas fa-times-circle summary-icon"></i>
+                                <small>No asignados</small>
+                                <span class="summary-value">{{notAssignedCount}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h4>Leyenda</h4>
+                    <div class="mb-1"><input type="checkbox" class="matrix-check" checked disabled> Permiso asignado</div>
+                    <div class="mb-1"><input type="checkbox" class="matrix-check" disabled> Permiso no asignado</div>
+                    <div><span class="text-muted">—</span> Operación sin permisos registrados</div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h4><i class="fas fa-balance-scale"></i> Reglas de acceso</h4>
+                    <ul class="pl-3 mb-0">
+                        <li>Si al menos uno de los roles del usuario posee el permiso, la operación se permite.</li>
+                        <li>Si ninguno de sus roles posee el permiso requerido, el acceso se deniega.</li>
+                        <li>Los cambios aplican a todos los usuarios que tengan asignado este rol.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                Retirar un permiso del rol no elimina el permiso del sistema.
+            </div>
+        </div>
+    </div>
+</div>

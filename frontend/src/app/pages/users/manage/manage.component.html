@@ -1,0 +1,105 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0" *ngIf="mode==1">Detalle del usuario</h3>
+                    <h3 class="mb-0" *ngIf="mode==2">Crear usuario</h3>
+                    <h3 class="mb-0" *ngIf="mode==3">Actualizar usuario</h3>
+                </div>
+                <div class="card-body">
+                    <form class="form" [formGroup]="theFormGroup">
+                        <div class="card-body container">
+                            <div class="row" *ngIf="mode!=2">
+                                <div class="col-3">ID</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" formControlName="id" readonly>
+                                </div>
+                            </div>
+                            <br *ngIf="mode!=2">
+                            <div class="row">
+                                <div class="col-3">Nombre</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control"
+                                        [readonly]="mode==1" formControlName="name">
+
+                                    <div
+                                        *ngIf="getTheFormGroup.name.errors && (getTheFormGroup.name.dirty || getTheFormGroup.name.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.name.errors.required"
+                                            class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.name.errors.minlength || getTheFormGroup.name.errors.maxlength"
+                                            class="msnError">Debe tener entre 2 y 100 caracteres</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Correo electrónico</div>
+                                <div class="col-9">
+                                    <input type="email" class="form-control"
+                                        [readonly]="mode==1" formControlName="email">
+
+                                    <div
+                                        *ngIf="getTheFormGroup.email.errors && (getTheFormGroup.email.dirty || getTheFormGroup.email.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.email.errors.required"
+                                            class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.email.errors.email"
+                                            class="msnError">Formato de correo inválido</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row" *ngIf="mode!=1 && !isExternalAccount">
+                                <div class="col-3">Contraseña</div>
+                                <div class="col-9">
+                                    <input type="password" class="form-control" formControlName="password"
+                                        autocomplete="new-password"
+                                        [placeholder]="mode==3 ? 'Dejar vacío para conservar la actual' : ''">
+                                    <small class="text-muted">{{passwordRuleMessage}}</small>
+
+                                    <div
+                                        *ngIf="getTheFormGroup.password.errors && (getTheFormGroup.password.dirty || getTheFormGroup.password.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.password.errors.required"
+                                            class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.password.errors.pattern"
+                                            class="msnError">La contraseña no cumple las reglas de seguridad</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" *ngIf="mode!=2 && user.authProvider">
+                                <div class="col-3">Acceso</div>
+                                <div class="col-9">
+                                    <span class="badge badge-secondary">{{providerLabels[user.authProvider]}}</span>
+                                    <small *ngIf="isExternalAccount" class="text-muted ml-2">
+                                        Inicia sesión con su proveedor: no tiene contraseña en la plataforma.
+                                    </small>
+                                </div>
+                            </div>
+                            <br *ngIf="mode!=2 && user.authProvider">
+                            <div class="row" *ngIf="mode==1">
+                                <div class="col-3">Estado</div>
+                                <div class="col-9">
+                                    <span class="badge" [ngClass]="user.active ? 'badge-state-on' : 'badge-state-off'">
+                                        {{user.active ? 'Activo' : 'Inactivo'}}
+                                    </span>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-9">
+                                    <button type="button" class="btn btn-primary btn-block" (click)="create()"
+                                        *ngIf="mode==2">Crear</button>
+                                    <button type="button" class="btn btn-primary btn-block" (click)="update()"
+                                        *ngIf="mode==3">Actualizar</button>
+                                    <button type="button" class="btn btn-secondary btn-block" (click)="back()">Regresar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

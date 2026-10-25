@@ -1,0 +1,37 @@
+<nav class="navbar navbar-top navbar-expand-md" id="navbar-main">
+  <div class="container-fluid">
+    <!-- Título de la pantalla -->
+    <div class="page-heading">
+      <span class="page-eyebrow"><i class="fas fa-shield-alt"></i> SportManager · Módulo de seguridad</span>
+      <h1 class="page-title">{{title}}</h1>
+      <p class="page-subtitle" *ngIf="subtitle">{{subtitle}}</p>
+    </div>
+    <!-- Usuario -->
+    <ul class="navbar-nav align-items-center d-none d-md-flex ml-auto">
+      <li class="nav-item" ngbDropdown placement="bottom-right">
+        <a class="nav-link user-menu" role="button" ngbDropdownToggle>
+          <span class="avatar-initials">{{user?.name?.charAt(0) || '?'}}</span>
+          <span class="user-menu-text d-none d-lg-block">
+            <strong>{{user?.name || user?.email}}</strong>
+            <small>{{providerLabels[user?.authProvider] || ''}}</small>
+          </span>
+        </a>
+        <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
+          <div class="dropdown-header noti-title">
+            <h6 class="text-overflow m-0">{{user?.email}}</h6>
+          </div>
+          <a [routerLink]="['/profiles/me/view']" class="dropdown-item">
+            <i class="ni ni-single-02"></i><span>Mi perfil</span>
+          </a>
+          <a [routerLink]="['/security']" class="dropdown-item">
+            <i class="ni ni-lock-circle-open"></i><span>Seguridad</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="javascript:void(0)" class="dropdown-item" (click)="logout()">
+            <i class="ni ni-user-run"></i><span>Cerrar sesión</span>
+          </a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

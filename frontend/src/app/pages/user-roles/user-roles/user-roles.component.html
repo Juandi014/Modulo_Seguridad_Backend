@@ -1,0 +1,83 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">Roles del usuario: {{user.name}}</h3>
+                        <small class="text-muted">{{user.email}}</small>
+                    </div>
+                    <button class="btn btn-secondary" (click)="back()">Regresar</button>
+                </div>
+                <div class="card-body">
+                    <!-- Roles asignados -->
+                    <h4>Roles asignados ({{assigned.length}})</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of assigned">
+                                    <td>{{item.role.name}}</td>
+                                    <td>{{item.role.description}}</td>
+                                    <td>
+                                        <span class="badge" [ngClass]="item.role.active ? 'badge-state-on' : 'badge-state-off'">
+                                            {{item.role.active ? 'Activo' : 'Inactivo'}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary" (click)="remove(item)">Retirar</button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="assigned.length == 0">
+                                    <td colspan="4" class="text-center text-muted">El usuario no tiene roles asignados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- Roles disponibles -->
+                    <h4>Agregar roles ({{available.length}} disponibles)</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let role of available">
+                                    <td>{{role.name}}</td>
+                                    <td>{{role.description}}</td>
+                                    <td>
+                                        <span class="badge" [ngClass]="role.active ? 'badge-state-on' : 'badge-state-off'">
+                                            {{role.active ? 'Activo' : 'Inactivo'}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" (click)="assign(role)">Asignar</button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="available.length == 0">
+                                    <td colspan="4" class="text-center text-muted">No hay roles disponibles.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

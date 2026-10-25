@@ -1,0 +1,51 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap">
+                    <h3 class="mb-0">Listado de permisos</h3>
+                    <div class="d-flex align-items-center mt-2 mt-md-0">
+                        <select class="form-control mr-2" [(ngModel)]="moduleFilter">
+                            <option value="">Todos los módulos</option>
+                            <option *ngFor="let module of modules" [value]="module.value">{{module.label}}</option>
+                        </select>
+                        <button class="btn btn-primary text-nowrap" (click)="create()"><i class="ni ni-fat-add"></i> Crear permiso</button>
+                    </div>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Módulo</th>
+                                <th>Recurso</th>
+                                <th>Operación</th>
+                                <th>Método</th>
+                                <th>URL</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let permission of filteredPermissions">
+                                <td>{{moduleLabel(permission.module)}}</td>
+                                <td>{{permission.resource || '-'}}</td>
+                                <td>{{operationLabel(permission.operation)}}</td>
+                                <td><span class="badge badge-secondary">{{permission.method}}</span></td>
+                                <td><code class="text-primary">{{permission.url}}</code></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" (click)="view(permission.id)">Ver</button>
+                                    <button class="btn btn-sm btn-secondary" (click)="edit(permission.id)">Editar</button>
+                                    <button class="btn btn-sm btn-secondary" (click)="delete(permission)">Eliminar</button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="filteredPermissions.length == 0">
+                                <td colspan="6" class="text-center text-muted">No hay permisos registrados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

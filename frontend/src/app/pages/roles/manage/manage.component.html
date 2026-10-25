@@ -1,0 +1,87 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0" *ngIf="mode==1">Detalle del rol</h3>
+                    <h3 class="mb-0" *ngIf="mode==2">Crear rol</h3>
+                    <h3 class="mb-0" *ngIf="mode==3">Actualizar rol</h3>
+                </div>
+                <div class="card-body">
+                    <form class="form" [formGroup]="theFormGroup">
+                        <div class="card-body container">
+                            <div class="row" *ngIf="mode!=2">
+                                <div class="col-3">ID</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" formControlName="id" readonly>
+                                </div>
+                            </div>
+                            <br *ngIf="mode!=2">
+                            <div class="row">
+                                <div class="col-3">Nombre</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control"
+                                        [readonly]="mode==1" formControlName="name">
+
+                                    <div
+                                        *ngIf="getTheFormGroup.name.errors && (getTheFormGroup.name.dirty || getTheFormGroup.name.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.name.errors.required"
+                                            class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.name.errors.maxlength"
+                                            class="msnError">Máximo 50 caracteres</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Descripción</div>
+                                <div class="col-9">
+                                    <textarea class="form-control" rows="3"
+                                        [readonly]="mode==1" formControlName="description"></textarea>
+
+                                    <div
+                                        *ngIf="getTheFormGroup.description.errors && (getTheFormGroup.description.dirty || getTheFormGroup.description.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.description.errors.required"
+                                            class="msnError">Requerido</strong>
+                                        <strong *ngIf="getTheFormGroup.description.errors.maxlength"
+                                            class="msnError">Máximo 255 caracteres</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row" *ngIf="mode==1">
+                                <div class="col-3">Estado</div>
+                                <div class="col-9">
+                                    <span class="badge" [ngClass]="role.active ? 'badge-state-on' : 'badge-state-off'">
+                                        {{role.active ? 'Activo' : 'Inactivo'}}
+                                    </span>
+                                </div>
+                            </div>
+                            <br *ngIf="mode==1">
+                            <!-- Gestión de usuarios y permisos del rol -->
+                            <div class="row" *ngIf="mode==1">
+                                <div class="col-3">Gestionar</div>
+                                <div class="col-9">
+                                    <button type="button" class="btn btn-sm btn-secondary" (click)="users()">Usuarios del rol</button>
+                                    <button type="button" class="btn btn-sm btn-secondary" (click)="permissions()">Permisos del rol</button>
+                                </div>
+                            </div>
+                            <br *ngIf="mode==1">
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-9">
+                                    <button type="button" class="btn btn-primary btn-block" (click)="create()"
+                                        *ngIf="mode==2">Crear</button>
+                                    <button type="button" class="btn btn-primary btn-block" (click)="update()"
+                                        *ngIf="mode==3">Actualizar</button>
+                                    <button type="button" class="btn btn-secondary btn-block" (click)="back()">Regresar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

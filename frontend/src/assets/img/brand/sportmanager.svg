@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Favicon de SportManager. Colores de la paleta: #213448 fondo, #ECEFCA texto -->
+  <path d="M32 3 L56 12 V30 C56 45 46 56 32 61 C18 56 8 45 8 30 V12 Z" fill="#213448" stroke="#ECEFCA" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="32" cy="33" r="13" fill="#ECEFCA"/>
+  <polygon points="32,26 38.66,30.84 36.11,38.66 27.89,38.66 25.34,30.84" fill="#213448"/>
+  <path d="M32 26 V20 M38.66 30.84 L44.36 28.98 M36.11 38.66 L39.64 43.52 M27.89 38.66 L24.36 43.52 M25.34 30.84 L19.64 28.98" stroke="#213448" stroke-width="1.6"/>
+</svg>

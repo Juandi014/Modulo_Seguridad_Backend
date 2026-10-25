@@ -1,0 +1,89 @@
+<!-- Page content -->
+<div class="container-fluid page-content">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header bg-transparent">
+                    <h3 class="mb-0" *ngIf="mode==1">{{isMine ? 'Mi perfil' : 'Perfil del usuario'}}</h3>
+                    <h3 class="mb-0" *ngIf="mode==3">{{hasProfile ? 'Actualizar perfil' : 'Registrar perfil'}}</h3>
+                    <small class="text-muted">
+                        Los datos del perfil no modifican el correo ni la contraseña de acceso.
+                    </small>
+                </div>
+                <div class="card-body">
+                    <form class="form" [formGroup]="theFormGroup">
+                        <div class="card-body container">
+                            <!-- Usuario al que pertenece el perfil (solo lectura) -->
+                            <div class="row">
+                                <div class="col-3">Usuario</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" [value]="userDetail.name || ''" readonly>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Correo electrónico</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" [value]="userDetail.email || ''" readonly>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row" *ngIf="mode==1 && !hasProfile">
+                                <div class="col-12 text-center text-muted">
+                                    Este usuario aún no tiene perfil registrado.
+                                </div>
+                            </div>
+                            <br *ngIf="mode==1 && !hasProfile">
+                            <div class="row">
+                                <div class="col-3">Fotografía</div>
+                                <div class="col-9">
+                                    <img *ngIf="selectedPhotoUrl || photoUrl" [src]="selectedPhotoUrl || photoUrl"
+                                        class="profile-photo rounded-circle" alt="Fotografía del perfil">
+                                    <div *ngIf="!selectedPhotoUrl && !photoUrl" class="profile-photo profile-photo-empty rounded-circle">
+                                        <i class="ni ni-single-02"></i>
+                                    </div>
+                                    <div *ngIf="mode==3" class="mt-3">
+                                        <input type="file" class="form-control" accept="image/png,image/jpeg"
+                                            (change)="onPhotoSelected($event)">
+                                        <small class="text-muted">JPG o PNG, máximo 2 MB.</small>
+                                        <div *ngIf="userDetail.profile?.hasPhoto && !selectedPhoto" class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-secondary" (click)="removePhoto()">
+                                                Quitar fotografía
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3">Teléfono</div>
+                                <div class="col-9">
+                                    <input type="text" class="form-control" formControlName="phone"
+                                        [readonly]="mode==1" [placeholder]="mode==3 ? 'Opcional' : ''">
+
+                                    <div
+                                        *ngIf="getTheFormGroup.phone.errors && (getTheFormGroup.phone.dirty || getTheFormGroup.phone.touched || trySend)">
+                                        <strong *ngIf="getTheFormGroup.phone.errors.pattern" class="msnError">
+                                            Entre 7 y 20 caracteres: números, espacios, +, paréntesis y guiones
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-9">
+                                    <button type="button" class="btn btn-primary btn-block" (click)="edit()"
+                                        *ngIf="mode==1">{{hasProfile ? 'Editar perfil' : 'Registrar perfil'}}</button>
+                                    <button type="button" class="btn btn-primary btn-block" (click)="save()"
+                                        *ngIf="mode==3">Guardar</button>
+                                    <button type="button" class="btn btn-secondary btn-block" (click)="back()">Regresar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
