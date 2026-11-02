@@ -109,6 +109,30 @@ public class SessionServiceImpl implements ISessionService {
     }
 
     @Override
+    public AuthResponseDTO refresh(String tokenId) {
+        Session session = sessionRepository.findByToken(tokenId)
+                .filter(found -> found.getStatus() == SessionStatus.ACTIVE)
+                .filter(found -> found.getRevokedAt() == null)
+                .filter(found -> found.getExpiration().isAfter(LocalDateTime.now()))
+                .orElseThrow(() -> new ApplicationException(
+                        ErrorCase.UNAUTHORIZED,
+                        "La sesión expiró o fue cerrada. Inicie sesión nuevamente."
+                ));
+
+        User user = session.getUser();
+        IssuedTokenDTO token = accessTokenIssuer.renew(user, session.getToken());
+        session.setExpiration(LocalDateTime.ofInstant(token.expiresAt(), ZoneId.systemDefault()));
+        sessionRepository.save(session);
+
+        return new AuthResponseDTO(
+                token.value(),
+                "Bearer",
+                token.expiresAt(),
+                userMapper.toResponseDTO(user)
+        );
+    }
+
+    @Override
     public void close(String tokenId) {
         sessionRepository.findByToken(tokenId).ifPresent(session -> {
             if (session.getRevokedAt() == null) {

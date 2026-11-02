@@ -32,9 +32,13 @@ public class JwtAccessTokenIssuer implements IAccessTokenIssuer {
 
     @Override
     public IssuedTokenDTO issue(User user) {
+        return renew(user, UUID.randomUUID().toString());
+    }
+
+    @Override
+    public IssuedTokenDTO renew(User user, String tokenId) {
         Instant now = Instant.now();
         Instant expiresAt = now.plus(tokenDuration);
-        String tokenId = UUID.randomUUID().toString();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("ms-security")

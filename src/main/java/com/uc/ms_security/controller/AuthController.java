@@ -8,6 +8,7 @@ import com.uc.ms_security.dto.auth.TwoFactorCancelRequestDTO;
 import com.uc.ms_security.dto.auth.TwoFactorVerifyRequestDTO;
 import com.uc.ms_security.service.IAuthService;
 import com.uc.ms_security.service.IOAuthLoginService;
+import com.uc.ms_security.service.ISessionService;
 import com.uc.ms_security.service.ITwoFactorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class AuthController {
     private final IAuthService authService;
     private final IOAuthLoginService oauthLoginService;
     private final ITwoFactorService twoFactorService;
+    private final ISessionService sessionService;
 
     @PostMapping("/login")
     public LoginResponseDTO login(
@@ -48,6 +50,13 @@ public class AuthController {
     public void cancelTwoFactor(
             @Valid @RequestBody TwoFactorCancelRequestDTO dto) {
         twoFactorService.cancel(dto.getChallengeId());
+    }
+
+    // Renueva la sesión vigente del token: responde un token nuevo y
+    // extiende la expiración (otros 10 minutos desde ahora)
+    @PostMapping("/refresh")
+    public AuthResponseDTO refresh(@AuthenticationPrincipal Jwt jwt) {
+        return sessionService.refresh(jwt.getId());
     }
 
     // Cierra la sesión del token con el que se hace la petición

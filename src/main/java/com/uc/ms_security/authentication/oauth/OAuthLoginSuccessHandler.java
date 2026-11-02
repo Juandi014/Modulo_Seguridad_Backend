@@ -74,6 +74,12 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
         } catch (ApplicationException exception) {
             target = frontendUrl + "/#/login?oauthError="
                     + URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
+        } catch (RuntimeException exception) {
+            // Fallo inesperado: se registra en consola y se vuelve al login con un aviso
+            exception.printStackTrace();
+            target = frontendUrl + "/#/login?oauthError=" + URLEncoder.encode(
+                    "Ocurrió un error inesperado al iniciar sesión con el proveedor externo",
+                    StandardCharsets.UTF_8);
         } finally {
             // No se conserva nada del proveedor en el servidor
             authorizedClientService.removeAuthorizedClient(registrationId, oauthToken.getName());

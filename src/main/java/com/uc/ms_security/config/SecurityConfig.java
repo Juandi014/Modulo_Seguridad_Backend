@@ -54,10 +54,14 @@ public class SecurityConfig {
                                 "/api/auth/2fa/verify",
                                 "/api/auth/2fa/cancel",
                                 "/oauth2/**",
-                                "/login/oauth2/**"
+                                "/login/oauth2/**",
+                                // Página de error de Spring: si se protege, cualquier fallo se ve como 403
+                                "/error"
                         ).permitAll()
                         // Cerrar la propia sesión: basta con estar autenticado
                         .requestMatchers("/api/auth/logout").authenticated()
+                        // Renovar la sesión: solo si el usuario sigue activo
+                        .requestMatchers("/api/auth/refresh").access(activeUserAuthorizationManager)
                         // Rutas personales: cualquier usuario activo, sobre su propia cuenta
                         .requestMatchers("/api/profile/me", "/api/profile/me/**", "/api/account/**")
                                 .access(activeUserAuthorizationManager)

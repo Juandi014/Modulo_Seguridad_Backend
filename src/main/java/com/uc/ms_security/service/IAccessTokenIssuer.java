@@ -11,4 +11,10 @@ import com.uc.ms_security.entity.User;
 public interface IAccessTokenIssuer {
 
     IssuedTokenDTO issue(User user);
+
+    /**
+     * Emite un token nuevo que conserva el identificador (jti) de la sesión,
+     * con una expiración contada desde ahora. Se usa al renovar la sesión.
+     */
+    IssuedTokenDTO renew(User user, String tokenId);
 }

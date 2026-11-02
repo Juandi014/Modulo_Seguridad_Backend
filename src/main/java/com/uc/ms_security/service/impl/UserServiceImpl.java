@@ -12,11 +12,13 @@ import com.uc.ms_security.exception.ApplicationException;
 import com.uc.ms_security.exception.ErrorCase;
 import com.uc.ms_security.mapper.UserMapper;
 import com.uc.ms_security.repository.UserRepository;
+import com.uc.ms_security.service.ISessionService;
 import com.uc.ms_security.service.IUserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +31,8 @@ public class UserServiceImpl implements IUserService {
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final ISessionService sessionService;
 
     @Override
     public UserResponseDTO create(CreateUserDTO dto) {
@@ -122,9 +126,11 @@ public class UserServiceImpl implements IUserService {
         return userMapper.toResponseDTO(updatedUser);
     }
 
-    // Desactivar solo cambia el estado: el usuario conserva sus roles,
-    // perfil y sesiones, y los roles y permisos del sistema no se tocan.
+    // Desactivar cambia el estado y cierra sus sesiones abiertas: en su
+    // siguiente petición el backend responde 401. Conserva roles y perfil,
+    // y los roles y permisos del sistema no se tocan.
     @Override
+    @Transactional
     public UserResponseDTO deactivate(Long id, Long currentUserId) {
         User user = findUser(id);
         if (id.equals(currentUserId)) {
@@ -140,7 +146,9 @@ public class UserServiceImpl implements IUserService {
             );
         }
         user.setActive(false);
-        return userMapper.toResponseDTO(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        sessionService.closeAllForUser(id);
+        return userMapper.toResponseDTO(savedUser);
     }
 
     @Override

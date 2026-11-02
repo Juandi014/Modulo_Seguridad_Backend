@@ -37,6 +37,12 @@ public interface ISessionService {
     /** Indica si el token pertenece a una sesión activa, no revocada y no expirada. */
     boolean isActive(String tokenId);
 
+    /**
+     * Renueva una sesión vigente: emite un token nuevo con el mismo jti y
+     * extiende la expiración de la sesión desde este momento.
+     */
+    AuthResponseDTO refresh(String tokenId);
+
     /** Cierra la sesión del token indicado (logout): el token deja de ser válido. */
     void close(String tokenId);
 

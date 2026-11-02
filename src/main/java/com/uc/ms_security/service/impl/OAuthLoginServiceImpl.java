@@ -16,7 +16,6 @@ import com.uc.ms_security.service.IOAuthLoginService;
 import com.uc.ms_security.service.ISessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,10 +32,11 @@ public class OAuthLoginServiceImpl implements IOAuthLoginService {
     private final IOAuthProviderRegistry providerRegistry;
     private final ILoginAuditService loginAuditService;
 
-    // Cada salida queda en la auditoría (el registro usa su propia transacción,
-    // por eso se conserva aunque esta se deshaga por el rechazo)
+    // Cada salida queda en la auditoría. Sin @Transactional a propósito: el
+    // usuario nuevo debe quedar confirmado antes de auditar, porque el registro
+    // de auditoría usa su propia transacción (REQUIRES_NEW) y referencia a ese
+    // usuario; si siguiera sin confirmar, MySQL bloquearía el insert.
     @Override
-    @Transactional
     public AuthResponseDTO login(OAuthProfileDTO profile) {
         if (profile.providerId() == null) {
             audit(profile, null, LoginAttemptResult.OAUTH_REJECTED);
